@@ -48,6 +48,7 @@ public class ContentFragment extends BaseFragment {
         rv.setLayoutManager(layoutManager);
         ContentAdapter adapter = new ContentAdapter();
         rv.setAdapter(adapter);
+        rv.setHasFixedSize(true);
         new ItemTouchHelper(adapter.buildItemTouchHelperCallback()).attachToRecyclerView(rv);
     }
 
@@ -74,6 +75,7 @@ public class ContentFragment extends BaseFragment {
                 break;
         }
         layoutManager.requestLayout();
+        rv.getAdapter().notifyItemRangeChanged(layoutManager.findFirstVisibleItemPosition(), 0);
         return true;
     }
 }
