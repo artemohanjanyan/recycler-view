@@ -1,6 +1,8 @@
 package ru.yandex.yamblz.ui.fragments;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -28,6 +30,13 @@ class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentHolder> 
     @Override
     public void onBindViewHolder(ContentHolder holder, int position) {
         holder.bind(createColorForPosition(position));
+        holder.itemView.setOnClickListener(v -> {
+            int realPosition = holder.getAdapterPosition();
+            int color = Color.rgb(rnd.nextInt(255), rnd.nextInt(255), rnd.nextInt(255));
+            colors.set(realPosition, color);
+            holder.bind(color);
+            notifyItemChanged(realPosition);
+        });
     }
 
     @Override
@@ -58,6 +67,12 @@ class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentHolder> 
     }
 
     private class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
+        private final Paint backgroundPaint = new Paint();
+
+        {
+            backgroundPaint.setColor(Color.RED);
+        }
+
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN |
@@ -87,6 +102,21 @@ class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentHolder> 
             int position = viewHolder.getAdapterPosition();
             ContentAdapter.this.colors.remove(position);
             notifyItemRemoved(position);
+        }
+
+        @Override
+        public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                                RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                int actionState, boolean isCurrentlyActive) {
+            // item is deleted if it is dragged at least by recyclerView.getWidth() / 2
+            backgroundPaint.setAlpha(
+                    Math.min(255, (int) (dX / recyclerView.getWidth() * 255 * 2)));
+
+            View view = viewHolder.itemView;
+            c.drawRect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom(),
+                    backgroundPaint);
+
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
     }
 
