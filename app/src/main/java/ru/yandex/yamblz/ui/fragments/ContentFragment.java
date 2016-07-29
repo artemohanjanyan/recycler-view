@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import butterknife.BindView;
 import ru.yandex.yamblz.R;
+import ru.yandex.yamblz.task.ContentAdapter;
 
 public class ContentFragment extends BaseFragment {
 

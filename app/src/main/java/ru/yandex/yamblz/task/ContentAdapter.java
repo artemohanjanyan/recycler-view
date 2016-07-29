@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,9 +38,8 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentH
             if (realPosition == RecyclerView.NO_POSITION) {
                 return;
             }
-            int color = Color.rgb(rnd.nextInt(255), rnd.nextInt(255), rnd.nextInt(255));
 
-            holder.oldColor = colors.get(realPosition);
+            int color = Color.rgb(rnd.nextInt(255), rnd.nextInt(255), rnd.nextInt(255));
             colors.set(realPosition, color);
 
             holder.bind(color);
@@ -66,8 +64,6 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentH
     }
 
     static class ContentHolder extends RecyclerView.ViewHolder {
-        int oldColor;
-
         ContentHolder(View itemView) {
             super(itemView);
         }
@@ -123,7 +119,6 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentH
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
             if (actionState == ACTION_STATE_DRAG) {
-                Log.d("qq", "drag");
                 return;
             }
 
