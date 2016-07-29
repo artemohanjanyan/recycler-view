@@ -1,10 +1,11 @@
-package ru.yandex.yamblz.ui.fragments;
+package ru.yandex.yamblz.task;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,9 @@ import java.util.Random;
 
 import ru.yandex.yamblz.R;
 
-class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentHolder> {
+import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
+
+public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentHolder> {
 
     private final Random rnd = new Random();
     private final List<Integer> colors = new ArrayList<>();
@@ -30,12 +33,19 @@ class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentHolder> 
     @Override
     public void onBindViewHolder(ContentHolder holder, int position) {
         holder.bind(createColorForPosition(position));
+
         holder.itemView.setOnClickListener(v -> {
             int realPosition = holder.getAdapterPosition();
+            if (realPosition == RecyclerView.NO_POSITION) {
+                return;
+            }
             int color = Color.rgb(rnd.nextInt(255), rnd.nextInt(255), rnd.nextInt(255));
+
+            holder.oldColor = colors.get(realPosition);
             colors.set(realPosition, color);
+
             holder.bind(color);
-            notifyItemChanged(realPosition);
+            notifyItemChanged(realPosition, new Object());
         });
     }
 
@@ -51,11 +61,13 @@ class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentHolder> 
         return colors.get(position);
     }
 
-    ItemTouchHelper.Callback buildItemTouchHelperCallback() {
+    public ItemTouchHelper.Callback buildItemTouchHelperCallback() {
         return new ItemTouchHelperCallback();
     }
 
     static class ContentHolder extends RecyclerView.ViewHolder {
+        int oldColor;
+
         ContentHolder(View itemView) {
             super(itemView);
         }
@@ -108,15 +120,21 @@ class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentHolder> 
         public void onChildDraw(Canvas c, RecyclerView recyclerView,
                                 RecyclerView.ViewHolder viewHolder, float dX, float dY,
                                 int actionState, boolean isCurrentlyActive) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+            if (actionState == ACTION_STATE_DRAG) {
+                Log.d("qq", "drag");
+                return;
+            }
+
             // item is deleted if it is dragged at least by recyclerView.getWidth() / 2
             backgroundPaint.setAlpha(
-                    Math.min(255, (int) (dX / recyclerView.getWidth() * 255 * 2)));
+                    Math.min(255, (int) (dX / recyclerView.getWidth() * 255 /
+                            getSwipeThreshold(viewHolder))));
 
             View view = viewHolder.itemView;
             c.drawRect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom(),
                     backgroundPaint);
-
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
     }
 
