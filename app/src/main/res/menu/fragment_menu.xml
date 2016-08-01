@@ -9,6 +9,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/menu_item_animations"
+        android:icon="@drawable/ic_flip_to_front_black_24dp"
+        android:title="@string/animations"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/menu_item_remove"
         android:icon="@drawable/ic_exposure_neg_1_24dp"
         android:title="@string/remove_column"

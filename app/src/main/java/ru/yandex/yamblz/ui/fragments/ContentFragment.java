@@ -1,5 +1,7 @@
 package ru.yandex.yamblz.ui.fragments;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,18 +20,24 @@ import ru.yandex.yamblz.R;
 import ru.yandex.yamblz.task.ContentAdapter;
 import ru.yandex.yamblz.task.ItemDecoration;
 import ru.yandex.yamblz.task.ItemTouchHelperCallback;
+import ru.yandex.yamblz.task.NewItemsScrollListener;
 
 public class ContentFragment extends BaseFragment {
 
     private static final String COLUMN_N = "column number";
+    private static final String FIRST_NOT_ANIMATED = "first not animated";
+    private static final String IS_DECORATED = "is decorated";
+    private static final String HAS_SCROLL_LISTENER = "has scroll listener";
 
     @BindView(R.id.rv)
     RecyclerView rv;
 
     private GridLayoutManager layoutManager;
-
     private RecyclerView.ItemDecoration itemDecoration;
     private boolean isDecorated = false;
+
+    private NewItemsScrollListener scrollListener;
+    private boolean hasScrollListener = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,11 +61,32 @@ public class ContentFragment extends BaseFragment {
         }
         layoutManager = new GridLayoutManager(getContext(), columnN);
         rv.setLayoutManager(layoutManager);
+
         ContentAdapter adapter = new ContentAdapter();
         rv.setAdapter(adapter);
         rv.setHasFixedSize(true);
+
         new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(rv);
         itemDecoration = new ItemDecoration();
+        if (savedInstanceState != null) {
+            isDecorated = savedInstanceState.getBoolean(IS_DECORATED, false);
+        }
+        setItemDecorations();
+
+        scrollListener = new NewItemsScrollListener(itemView -> {
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(
+                    ObjectAnimator.ofFloat(itemView, "scaleX", 0.5f, 1f),
+                    ObjectAnimator.ofFloat(itemView, "scaleY", 0.5f, 1f)
+            );
+            animatorSet.setDuration(500);
+            return animatorSet;
+        }, rv);
+        if (savedInstanceState != null) {
+            scrollListener.setFirstNotAnimated(savedInstanceState.getInt(FIRST_NOT_ANIMATED, 0));
+            hasScrollListener = savedInstanceState.getBoolean(HAS_SCROLL_LISTENER, false);
+        }
+        setScrollListener();
     }
 
     @Override
@@ -70,6 +99,9 @@ public class ContentFragment extends BaseFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(COLUMN_N, layoutManager.getSpanCount());
+        outState.putInt(FIRST_NOT_ANIMATED, scrollListener.getFirstNotAnimated());
+        outState.putBoolean(IS_DECORATED, isDecorated);
+        outState.putBoolean(HAS_SCROLL_LISTENER, hasScrollListener);
     }
 
     @Override
@@ -82,16 +114,33 @@ public class ContentFragment extends BaseFragment {
                 layoutManager.setSpanCount(Math.max(1, layoutManager.getSpanCount() - 1));
                 break;
             case R.id.menu_item_decorations:
-                if (isDecorated) {
-                    rv.removeItemDecoration(itemDecoration);
-                } else {
-                    rv.addItemDecoration(itemDecoration);
-                }
                 isDecorated = !isDecorated;
+                setItemDecorations();
+                break;
+            case R.id.menu_item_animations:
+                hasScrollListener = !hasScrollListener;
+                setScrollListener();
                 break;
         }
         layoutManager.requestLayout();
         rv.getAdapter().notifyItemRangeChanged(layoutManager.findFirstVisibleItemPosition(), 0);
         return true;
+    }
+
+    private void setItemDecorations() {
+        if (isDecorated) {
+            rv.addItemDecoration(itemDecoration);
+        } else {
+            rv.removeItemDecoration(itemDecoration);
+        }
+    }
+
+    private void setScrollListener() {
+        if (hasScrollListener) {
+            scrollListener.animateNewItems(rv);
+            rv.addOnScrollListener(scrollListener);
+        } else {
+            rv.removeOnScrollListener(scrollListener);
+        }
     }
 }
