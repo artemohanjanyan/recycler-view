@@ -26,6 +26,9 @@ public class ContentFragment extends BaseFragment {
 
     private GridLayoutManager layoutManager;
 
+    private RecyclerView.ItemDecoration itemDecoration;
+    private boolean isDecorated = false;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +37,8 @@ public class ContentFragment extends BaseFragment {
 
     @NonNull
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_content, container, false);
     }
 
@@ -51,6 +55,7 @@ public class ContentFragment extends BaseFragment {
         rv.setAdapter(adapter);
         rv.setHasFixedSize(true);
         new ItemTouchHelper(adapter.buildItemTouchHelperCallback()).attachToRecyclerView(rv);
+        itemDecoration = adapter.buildItemDecoration();
     }
 
     @Override
@@ -73,6 +78,14 @@ public class ContentFragment extends BaseFragment {
                 break;
             case R.id.menu_item_remove:
                 layoutManager.setSpanCount(Math.max(1, layoutManager.getSpanCount() - 1));
+                break;
+            case R.id.menu_item_decorations:
+                if (isDecorated) {
+                    rv.removeItemDecoration(itemDecoration);
+                } else {
+                    rv.addItemDecoration(itemDecoration);
+                }
+                isDecorated = !isDecorated;
                 break;
         }
         layoutManager.requestLayout();

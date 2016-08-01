@@ -3,6 +3,7 @@ package ru.yandex.yamblz.task;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -63,6 +64,10 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentH
         return new ItemTouchHelperCallback();
     }
 
+    public RecyclerView.ItemDecoration buildItemDecoration() {
+        return new ItemDecoration();
+    }
+
     static class ContentHolder extends RecyclerView.ViewHolder {
         ContentHolder(View itemView) {
             super(itemView);
@@ -71,6 +76,35 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentH
         void bind(Integer color) {
             itemView.setBackgroundColor(color);
             ((TextView) itemView).setText("#".concat(Integer.toHexString(color).substring(2)));
+        }
+    }
+
+    private static class ItemDecoration extends RecyclerView.ItemDecoration {
+        private Paint paint = new Paint();
+
+        private ItemDecoration() {
+            paint.setStyle(Paint.Style.STROKE);
+        }
+
+        @Override
+        public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            final float strokeHalfWidth = parent.getChildAt(0).getWidth() / 50;
+            paint.setStrokeWidth(strokeHalfWidth * 2);
+
+            for (int i = 0; i < parent.getChildCount(); ++i) {
+                final View child = parent.getChildAt(i);
+                final int position = parent.getChildAdapterPosition(child);
+
+                if (position % 2 == 0) {
+                    int backgroundColor = ((ColorDrawable) child.getBackground()).getColor();
+                    paint.setColor(0xFF000000 | ~backgroundColor);
+                    c.drawRect(child.getLeft() + strokeHalfWidth,
+                            child.getTop() + strokeHalfWidth,
+                            child.getRight() - strokeHalfWidth,
+                            child.getBottom() - strokeHalfWidth,
+                            paint);
+                }
+            }
         }
     }
 

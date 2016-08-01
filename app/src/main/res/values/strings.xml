@@ -3,4 +3,5 @@
     <string name="content">Hello</string>
     <string name="add_column">Добавить колонку</string>
     <string name="remove_column">Убрать колонку</string>
+    <string name="decorations">Декорации</string>
 </resources>

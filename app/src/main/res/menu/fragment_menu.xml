@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_item_decorations"
+        android:icon="@drawable/ic_crop_5_4_black_24dp"
+        android:title="@string/decorations"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/menu_item_remove"
         android:icon="@drawable/ic_exposure_neg_1_24dp"
         android:title="@string/remove_column"
