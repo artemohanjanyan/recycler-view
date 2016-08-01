@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import butterknife.BindView;
 import ru.yandex.yamblz.R;
 import ru.yandex.yamblz.task.ContentAdapter;
+import ru.yandex.yamblz.task.ItemDecoration;
+import ru.yandex.yamblz.task.ItemTouchHelperCallback;
 
 public class ContentFragment extends BaseFragment {
 
@@ -54,8 +56,8 @@ public class ContentFragment extends BaseFragment {
         ContentAdapter adapter = new ContentAdapter();
         rv.setAdapter(adapter);
         rv.setHasFixedSize(true);
-        new ItemTouchHelper(adapter.buildItemTouchHelperCallback()).attachToRecyclerView(rv);
-        itemDecoration = adapter.buildItemDecoration();
+        new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(rv);
+        itemDecoration = new ItemDecoration();
     }
 
     @Override
