@@ -43,8 +43,7 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentH
             int color = Color.rgb(rnd.nextInt(255), rnd.nextInt(255), rnd.nextInt(255));
             colors.set(realPosition, color);
 
-            holder.bind(color);
-            notifyItemChanged(realPosition, new Object());
+            notifyItemChanged(realPosition);
         });
     }
 
