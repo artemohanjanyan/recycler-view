@@ -24,7 +24,7 @@ public class ItemDecoration extends RecyclerView.ItemDecoration {
      * @return inverted color.
      */
     private static int invertColor(int color) {
-        return (0xFF000000 & color) | ~(0x00FFFFFF & color);
+        return (0xFF000000 & color) | (0x00FFFFFF & ~color);
     }
 
     @Override
