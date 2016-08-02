@@ -17,6 +17,7 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentH
 
     final List<Integer> colors = new ArrayList<>();
     private final Random rnd = new Random();
+    int from = -1, to = -1;
 
     @Override
     public ContentHolder onCreateViewHolder(ViewGroup parent, int viewType) {

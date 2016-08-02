@@ -33,8 +33,7 @@ public class ContentFragment extends BaseFragment {
     RecyclerView rv;
 
     private GridLayoutManager layoutManager;
-    private RecyclerView.ItemDecoration itemDecoration;
-    private boolean isDecorated = false;
+    private ItemDecoration itemDecoration;
 
     private NewItemsScrollListener scrollListener;
     private boolean hasScrollListener = false;
@@ -67,11 +66,11 @@ public class ContentFragment extends BaseFragment {
         rv.setHasFixedSize(true);
 
         new ItemTouchHelper(new ItemTouchHelperCallback(adapter)).attachToRecyclerView(rv);
-        itemDecoration = new ItemDecoration();
+        itemDecoration = new ItemDecoration(adapter);
         if (savedInstanceState != null) {
-            isDecorated = savedInstanceState.getBoolean(IS_DECORATED, false);
+            itemDecoration.setDecorated(savedInstanceState.getBoolean(IS_DECORATED, false));
         }
-        setItemDecorations();
+        rv.addItemDecoration(itemDecoration);
 
         scrollListener = new NewItemsScrollListener(itemView -> {
             AnimatorSet animatorSet = new AnimatorSet();
@@ -100,7 +99,7 @@ public class ContentFragment extends BaseFragment {
         super.onSaveInstanceState(outState);
         outState.putInt(COLUMN_N, layoutManager.getSpanCount());
         outState.putInt(FIRST_NOT_ANIMATED, scrollListener.getFirstNotAnimated());
-        outState.putBoolean(IS_DECORATED, isDecorated);
+        outState.putBoolean(IS_DECORATED, itemDecoration.isDecorated());
         outState.putBoolean(HAS_SCROLL_LISTENER, hasScrollListener);
     }
 
@@ -114,8 +113,7 @@ public class ContentFragment extends BaseFragment {
                 layoutManager.setSpanCount(Math.max(1, layoutManager.getSpanCount() - 1));
                 break;
             case R.id.menu_item_decorations:
-                isDecorated = !isDecorated;
-                setItemDecorations();
+                itemDecoration.setDecorated(!itemDecoration.isDecorated());
                 break;
             case R.id.menu_item_animations:
                 hasScrollListener = !hasScrollListener;
@@ -125,14 +123,6 @@ public class ContentFragment extends BaseFragment {
         layoutManager.requestLayout();
         rv.getAdapter().notifyItemRangeChanged(layoutManager.findFirstVisibleItemPosition(), 0);
         return true;
-    }
-
-    private void setItemDecorations() {
-        if (isDecorated) {
-            rv.addItemDecoration(itemDecoration);
-        } else {
-            rv.removeItemDecoration(itemDecoration);
-        }
     }
 
     private void setScrollListener() {

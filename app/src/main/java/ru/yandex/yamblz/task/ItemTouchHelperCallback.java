@@ -41,6 +41,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
             }
         }
         contentAdapter.notifyItemMoved(from, to);
+        contentAdapter.from = from;
+        contentAdapter.to = to;
         return true;
     }
 

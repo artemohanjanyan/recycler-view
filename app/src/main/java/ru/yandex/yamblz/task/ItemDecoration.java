@@ -1,6 +1,7 @@
 package ru.yandex.yamblz.task;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
@@ -8,9 +9,12 @@ import android.view.View;
 
 public class ItemDecoration extends RecyclerView.ItemDecoration {
     private Paint paint = new Paint();
+    private ContentAdapter adapter;
+    private boolean isDecorated = false;
 
-    public ItemDecoration() {
+    public ItemDecoration(ContentAdapter adapter) {
         paint.setStyle(Paint.Style.STROKE);
+        this.adapter = adapter;
     }
 
     /**
@@ -32,7 +36,7 @@ public class ItemDecoration extends RecyclerView.ItemDecoration {
             View child = parent.getChildAt(i);
             int position = parent.getChildAdapterPosition(child);
 
-            if (position % 2 == 0) {
+            if (position % 2 == 0 && isDecorated()) {
                 int backgroundColor = ((ColorDrawable) child.getBackground()).getColor();
                 paint.setColor(invertColor(backgroundColor));
                 c.drawRect(child.getLeft() + strokeHalfWidth,
@@ -41,6 +45,20 @@ public class ItemDecoration extends RecyclerView.ItemDecoration {
                         child.getBottom() - strokeHalfWidth,
                         paint);
             }
+            if (position == adapter.from || position == adapter.to) {
+                paint.setColor(Color.RED);
+                c.drawLine(child.getLeft() + strokeHalfWidth * 3, child.getTop() + strokeHalfWidth * 2,
+                        child.getLeft() + strokeHalfWidth * 3, child.getBottom() - strokeHalfWidth * 2,
+                        paint);
+            }
         }
+    }
+
+    public boolean isDecorated() {
+        return isDecorated;
+    }
+
+    public void setDecorated(boolean decorated) {
+        isDecorated = decorated;
     }
 }
